@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+set timeout 300
+set IP [lindex $argv 0]
+#set PORT [lindex $argv 1]
+set USER [lindex root]
+set PASSWD [lindex uClinux]
+
+spawn telnet $IP
+expect "bluetel login:"
+send "$USER\r"
+expect "Password:"
+send "$PASSWD\r"
+#send "ssh weiqiong@C\r"
+#expect "password:"
+#send "pppppp\r"
+interact

@@ -1,0 +1,16 @@
+#!/bin/bash
+PLST=/data/software/muxueqz.m3u
+#mplayer -loop 0 -vo null -playlist $PLST  -msglevel all=4 -input file=/dev/shm/mfifo|while read a;do [ "${a//ANS/}" != "$a" ] &&  echo $a>/dev/shm/ififo ;done
+
+echo "#!/bin/bash" > /tmp/mp3.sh
+#echo \$PLST="$PLST" >> /tmp/mp3.sh
+echo "mplayer -loop 0 -vo null -playlist $PLST  -msglevel all=4 -input file=/dev/shm/mfifo|while read a;do [ \"\${a//ANS/}\" != \"\$a\" ] &&  echo \$a>/dev/shm/ififo ;done" >> /tmp/mp3.sh
+
+chmod a+x /tmp/mp3.sh
+
+xterm -e "/tmp/mp3.sh" &
+#xterm -e "mplayer -loop 0 -vo null -playlist $PLST  -msglevel all=4 -input file=/dev/shm/mfifo|while read a;do [ \"\${a//ANS/}\" != \"\$a\" ] &&  echo $a>/dev/shm/ififo ;done &"
+
+sleep 3
+
+xterm -e lrcdis

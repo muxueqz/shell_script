@@ -1,0 +1,14 @@
+#!/bin/sh
+T2S5=/data/software/muxueqztools/t2t-s5
+T2TFILE=`readlink -f $1`
+if [ -z $2 ] ;then
+	OUTFILE=`echo $T2TFILE|sed 's/t2s5$/html/g'`
+else
+	OUTFILE=$2
+fi
+#DIR=`dirname $OUTFILE`
+[ -z $T2TFILE ] && exit
+[ -z $OUTFILE ] && exit
+cd $T2S5
+cat index.t2t|sed "s!content.t2t!$T2TFILE!g"|txt2tags -i - -o -|sed "s#=\"ui/#=\"$T2S5/ui/#g" > $OUTFILE
+echo "txt2s5 wrote $OUTFILE"

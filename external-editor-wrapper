@@ -1,0 +1,2 @@
+#!/bin/bash
+script -a /tmp/external_editor.log -c "/opt/muxueqz-sh/external-editor $@"

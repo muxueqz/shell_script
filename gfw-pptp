@@ -1,0 +1,59 @@
+gfw-pptp (){
+    if [[ $1 == 0 ]] ; then
+	    DEFAULTROUTE=no
+    else
+	    DEFAULTROUTE=yes
+    fi
+    echo DEFAULTROUTE is $DEFAULTROUTE
+    cd /opt/muxueqz-sh/
+    echo 'run chnroutes'
+    [[ $DEFAULTROUTE == yes ]] && \
+    sudo ./vpnup &> /dev/null
+    sudo route del default gw `cat /tmp/openvpn_oldgw`
+while true
+do
+    ping -c3 8.8.8.8 -s 0
+    if [[ $? != 0 ]] ; then
+    ifconfig ppp0 &> /dev/null
+    if [[ $? == 0 ]] ; then
+    	[[ $DEFAULTROUTE != yes ]] && \
+    	sudo route add www.mobilevpn.net dev ppp0 && \
+	sudo route add 8.8.8.8 gw `cat /tmp/openvpn_oldgw` reject && \
+	sudo route add 8.8.8.8 dev ppp0 && \
+	sudo route add default gw 'cat /tmp/openvpn_oldgw'
+    wget -O /dev/null -q www.mobilevpn.net
+    else
+	    echo 'ppp0 no exist'
+    fi
+    pgrep pppd &> /dev/null && sleep 1s && continue
+#        if [[ $? != 0 ]] ; then
+#         echo 'ok'
+#        else
+    sudo pkill pppd
+    . gfw-get-vpn
+    sudo route add $VPN_SERVER gw `cat /tmp/openvpn_oldgw`
+    ping -c1 $VPN_SERVER -s 0 || continue
+    echo $SN
+    echo "You VPN Server is:$VPN_SERVER"
+    sudo pptpsetup --create ywko --server $VPN_SERVER --username $VPN_USER --password $VPN_PASS --encrypt
+    if [[ $DEFAULTROUTE == yes ]] ; then
+    	sudo pon ywko mtu 1416 defaultroute bsdcomp 15 deflate 15 logfile /dev/shm/pptp.log maxfail 1
+    	else
+    	sudo route add default gw `cat /tmp/openvpn_oldgw`
+    	sudo pon ywko mtu 1416 nodefaultroute bsdcomp 15 deflate 15 logfile /dev/shm/pptp.log maxfail 1
+    fi
+    echo 'nameserver 127.0.0.1'|sudo tee /etc/resolv.conf
+    echo 'nameserver 210.56.192.43'|sudo tee -a /etc/resolv.conf
+    pgrep pppd &> /dev/null
+    if [[ $? != 0 ]] ; then
+        continue
+    else
+        sleep 3s
+    fi
+#    fi
+    else
+        sleep 3s
+fi
+done
+}
+gfw-pptp $1
