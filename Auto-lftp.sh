@@ -1,6 +1,7 @@
 #!/bin/sh
 PASSFILE=~/.pass
 NAME=$1
+LFTP_OPTS=$3
 IP=`cat $PASSFILE |grep -v ^#| grep name=$NAME | cut -d " " -f2|cut -d "@" -f2|head -n1`
 OPASSWD=`cat $PASSFILE | grep -v "^#" | grep name=$NAME | cut -d " " -f3|head -n1`
 OPORT=`cat $PASSFILE | grep -v "^#" | grep name=$NAME | cut -d " " -f4|head -n1`
@@ -20,7 +21,5 @@ elif [ "$2" = "" ]; then
        PORT=$2
            fi
 
-
-
 echo $IP:$PORT $USER
-lftp -p $PORT sftp://$IP:$PORT -u $USER,$PASSWD
+lftp -e "$LFTP_OPTS" -p $PORT sftp://$IP:$PORT -u $USER,$PASSWD
